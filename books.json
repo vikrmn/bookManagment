@@ -1,0 +1,32 @@
+[
+  {
+    "id": 2,
+    "title": "Ulysses",
+    "author": "James Joyce"
+  },
+  {
+    "id": 3,
+    "title": "Utopia",
+    "author": "Sir Thomas Moor"
+  },
+  {
+    "id": 4,
+    "title": "Waste Land",
+    "author": "T.S Eliot"
+  },
+  {
+    "id": 5,
+    "title": "Treasure Islands",
+    "author": "R.L. Stevenson"
+  },
+  {
+    "id": 6,
+    "title": "The Great Gatsby",
+    "author": "F. Scott Fitzgerald"
+  },
+  {
+    "id": 6,
+    "title": "Wealth of Nations",
+    "author": "Adam Smith"
+  }
+]

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Books API Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-6 font-sans">
+
+  <h1 class="text-4xl font-bold text-blue-600 mb-8">📚 Books Manager</h1>
+
+  <!-- Book Form Card -->
+  <div class="bg-white shadow-lg rounded-xl p-6 w-full max-w-3xl mb-8">
+    <h2 class="text-2xl font-semibold mb-4 text-gray-700">➕ Add a New Book</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <input id="title" class="border rounded-md px-3 py-2" placeholder="Book Title">
+      <input id="author" class="border rounded-md px-3 py-2" placeholder="Book Author">
+      <button onclick="addBook()" class="bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Add Book</button>
+    </div>
+  </div>
+
+  <!-- Books List -->
+  <div class="bg-white shadow-lg rounded-xl p-6 w-full max-w-4xl">
+    <h2 class="text-2xl font-semibold mb-4 text-gray-700">📖 All Books</h2>
+    <div id="booksList" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:2000/book";
+
+    // Fetch and display books
+    async function getBooks() {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      const list = document.getElementById("booksList");
+      list.innerHTML = "";
+
+      if (data.length === 0) {
+        list.innerHTML = "<p class='text-gray-500 text-center col-span-full'>No books found.</p>";
+        return;
+      }
+
+      data.forEach(book => {
+        const card = document.createElement("div");
+        card.className = "bg-gray-50 p-4 rounded-lg shadow hover:shadow-lg transition flex flex-col justify-between";
+
+        card.innerHTML = `
+          <div>
+            <h3 class="font-bold text-lg text-gray-800">${book.title}</h3>
+            <p class="text-gray-600 mb-2">Author: ${book.author}</p>
+          </div>
+          <div class="flex gap-2 mt-2">
+            <button onclick="editBook(${book.id}, '${book.title}', '${book.author}')" class="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600">Edit</button>
+            <button onclick="deleteBookByClick(${book.id})" class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600">Delete</button>
+          </div>
+        `;
+
+        list.appendChild(card);
+      });
+    }
+
+    // Add Book
+    async function addBook() {
+      const title = document.getElementById("title").value;
+      const author = document.getElementById("author").value;
+
+      if(!title || !author) return alert("Please enter both title and author");
+
+      await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, author })
+      });
+
+      document.getElementById("title").value = "";
+      document.getElementById("author").value = "";
+      getBooks();
+    }
+
+    // Inline Edit Book
+    function editBook(id, currentTitle, currentAuthor) {
+      const newTitle = prompt("Update Book Title:", currentTitle);
+      if (newTitle === null) return;
+
+      const newAuthor = prompt("Update Book Author:", currentAuthor);
+      if (newAuthor === null) return;
+
+      updateBook(id, newTitle, newAuthor);
+    }
+
+    // Update Book (PUT)
+    async function updateBook(id, title, author) {
+      await fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, author })
+      });
+      getBooks();
+    }
+
+    // Delete Book
+    async function deleteBookByClick(id) {
+      if(!confirm("Are you sure you want to delete this book?")) return;
+
+      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      getBooks();
+    }
+
+    // Load books initially
+    getBooks();
+  </script>
+
+</body>
+</html>
